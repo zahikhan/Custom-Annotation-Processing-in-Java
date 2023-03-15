@@ -12,21 +12,22 @@ import lombok.SneakyThrows;
  * @Time 3/14/2023
  */
 public final class AnnotationProcessorFormatAdapter {
-
-
-    //NON INSTANTIABLE UTILITY CLASS.
-    private AnnotationProcessorFormatAdapter() {
-        throw new AssertionError("No instance for you!");
-    }
-
-    @SneakyThrows
-    public static String getSerializedObject(final String errorMessage, final long errorCode) {
-        ErrorStructure errorStructure = new ErrorStructure(errorMessage, errorCode);
-        return new ObjectMapper().writeValueAsString(errorStructure);
-    }
-
-    @SneakyThrows
-    public static ErrorStructure deserialize(String serializedValue) {
-        return new ObjectMapper().readValue(serializedValue, ErrorStructure.class);
-    }
+	
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+	
+	//NON INSTANTIABLE UTILITY CLASS.
+	private AnnotationProcessorFormatAdapter() {
+		throw new AssertionError("No instance for you!");
+	}
+	
+	@SneakyThrows
+	public static String getSerializedObject(final String errorMessage, final long errorCode) {
+		ErrorStructure errorStructure = new ErrorStructure(errorMessage, errorCode);
+		return objectMapper.writeValueAsString(errorStructure);
+	}
+	
+	@SneakyThrows
+	public static ErrorStructure deserialize(final String serializedValue) {
+		return objectMapper.readValue(serializedValue, ErrorStructure.class);
+	}
 }
