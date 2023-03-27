@@ -1,36 +1,32 @@
 package com.enterprise.integrations.annotation.processor;
 
-import com.enterprise.integrations.annotation.NotNull;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 /**
  * <h1>This class is for NotNullAnnotationProcessorTest.</h1>
- * <p>
- * Project Name: Annotation
  *
  * @author Zahid Khan
  * @Time 3/10/2023
  * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
-class NotNullAnnotationProcessorTest {
+class NotBlankAnnotationProcessorTest {
 	private NotNullAnnotationProcessor notNullAnnotationProcessor;
 	@Mock
 	private ConstraintValidatorContext.ConstraintViolationBuilder constraintViolationBuilder;
 	@Mock
-	private NotNull notNull;
+	private NotBlank notBlank;
 	@Mock
 	private ConstraintValidatorContext constraintValidatorContext;
 	
@@ -42,11 +38,11 @@ class NotNullAnnotationProcessorTest {
 	void setUp() {
 		lenient().when(constraintValidatorContext.buildConstraintViolationWithTemplate(anyString())).thenReturn(constraintViolationBuilder);
 		
-		when(notNull.message()).thenReturn("Error");
-		when(notNull.errorCode()).thenReturn(400L);
+		when(notBlank.message()).thenReturn("Error");
+		when(notBlank.errorCode()).thenReturn(400L);
 		
 		notNullAnnotationProcessor = new NotNullAnnotationProcessor();
-		notNullAnnotationProcessor.initialize(notNull);
+		notNullAnnotationProcessor.initialize(notBlank);
 	}
 	
 	@Test
@@ -59,7 +55,7 @@ class NotNullAnnotationProcessorTest {
 	
 	
 	@Test
-	void testAnnotation_2() {
+	void givenAnAnnotation_WhenEmpty_ThenShouldReturnNotValid() {
 		Employee employee = getEmployee("", "XYZ USA");
 		
 		assertFalse(notNullAnnotationProcessor.isValid(employee.name(), constraintValidatorContext));
@@ -67,7 +63,7 @@ class NotNullAnnotationProcessorTest {
 	}
 	
 	@Test
-	void testAnnotation_null() {
+	void givenAnAnnotation_WhenNullPassed_ThenShouldReturnNotValid() {
 		Employee employee = getEmployee(null, null);
 		
 		assertFalse(notNullAnnotationProcessor.isValid(employee.name(), constraintValidatorContext));
