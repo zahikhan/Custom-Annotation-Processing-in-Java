@@ -4,10 +4,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.enterprise.integrations.annotation.entities.ErrorStructure;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;import java.util.stream.Collectors;
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -39,21 +37,22 @@ class GlobalExceptionHandler {
   @ExceptionHandler
   ResponseEntity<Map<String, Object>> handleMethodArgumentException(
       MethodArgumentNotValidException exception) {
-    Map<String, Object> body = new LinkedHashMap<>(5, 1);
+    Map<String, Object> body = new LinkedHashMap<>(6, 1);
     body.put("timestamp", new Date());
     body.put("status", BAD_REQUEST.value());
     body.put("error", BAD_REQUEST.getReasonPhrase());
 
-    final List<ErrorStructure> errorStructures =
+     List<Set<ErrorStructure>> errorStructures =
         exception.getBindingResult().getFieldErrors().stream()
             .map(
                 error ->
-                    (ErrorStructure)
-                        error
-                            .unwrap(HibernateConstraintViolation.class)
-                            .getDynamicPayload(ErrorStructure.class))
+                        (Set<ErrorStructure>)error
+                        .unwrap(HibernateConstraintViolation.class)
+                        .getDynamicPayload(Object.class))
             .toList();
-    body.put("messages", errorStructures);
+    final List<ErrorStructure> errorStructures1 = errorStructures.stream().flatMap(Set::stream).toList();
+    
+    body.put("messages", errorStructures1);
     return ResponseEntity.status(BAD_REQUEST).contentType(APPLICATION_JSON).body(body);
   }
 }

@@ -9,6 +9,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.Getter;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class is for ConstraintValidator.
@@ -35,10 +37,12 @@ public class NotBlankAnnotationProcessor implements ConstraintValidator<NotBlank
     if (isValid) {
       return true;
     }
+    Set<ErrorStructure> errors = new HashSet<>();
     if ((context instanceof HibernateConstraintValidatorContext)) {
-      context
-          .unwrap(HibernateConstraintValidatorContext.class)
-          .withDynamicPayload(new ErrorStructure(getMessage(), getErrorCode()));
+      errors.add(new ErrorStructure(getMessage(), getErrorCode()));
+
+      errors.add(new ErrorStructure("Hellow1", 32L));
+      context.unwrap(HibernateConstraintValidatorContext.class).withDynamicPayload(errors);
     }
     return false;
   }
